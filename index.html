@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>2048</title>
+
+  <link href="style/main.css" rel="stylesheet" type="text/css">
+  <link rel="shortcut icon" href="favico.ico">
+  <link rel="apple-touch-icon" href="meta/apple-touch-icon.png">
+  <link rel="apple-touch-startup-image" href="meta/apple-touch-startup-image-640x1096.png"
+    media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"> <!-- iPhone 5+ -->
+  <link rel="apple-touch-startup-image" href="meta/apple-touch-startup-image-640x920.png"
+    media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)">
+  <!-- iPhone, retina -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport"
+    content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+
+<body>
+  <div class="container">
+    <div class="heading">
+      <h1 class="title">2048</h1>
+      <div class="scores-container">
+        <div class="score-container">0</div>
+        <div class="best-container">0</div>
+        <div id="timed" class="time-container">0</div>
+        <div id="timeb" class="time-container">00:00</div>
+      </div>
+    </div>
+
+    <div class="above-game">
+      <p class="game-intro">Join the numbers and get to the <strong>2048 tile!</strong></p>
+      <a class="restart-button">New Game</a>
+    </div>
+
+    <div class="game-container">
+      <div class="game-message">
+        <p></p>
+        <div class="lower">
+          <a class="keep-playing-button">Keep going</a>
+          <a class="retry-button">Try again</a>
+        </div>
+      </div>
+
+      <div id="grid-container" class="grid-container">
+        <div class="grid-row">
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+        </div>
+      </div>
+
+      <div class="tile-container">
+
+      </div>
+      <div class="level-buttons">
+        <a class="restart-button easy">Easy</a>
+        <a class="restart-button medium">Medium</a>
+        <a class="restart-button hard">Hard</a>
+        <a class="restart-button botb" id="botb" onclick="handleBot()">Bot</a>
+      </div>
+      <script>
+        // for (let i = 0; i < 4; i++) {
+        //   document.getElementById("grid-container").innerHTML += '<div class="grid-row">'
+        //   for (let j = 0; j < 4; j++) {
+        //     document.getElementsByClassName("grid-row")[i].innerHTML = '<div class="grid-cell"></div>'
+        //   }
+        // }
+        document.getElementById("botb").addEventListener('click', handleBot)
+        function handleBot() {
+          if (localStorage.getItem('isBot') == 2) {
+            localStorage.setItem('isBot', 1)
+            document.getElementById("botb").style.background = '#8f7a66'
+          } else {
+            localStorage.setItem('isBot', 2)
+            document.getElementById("botb").style.background = '#f2b179'
+          }
+            
+        }
+        function setbesttime() {
+          if (localStorage.getItem("bestTime")) {
+            let bestTime = localStorage.getItem("bestTime") / 1000; //in milliseconds
+            // strip the ms
+            // get minutes and seconds
+            var minutesb = Math.floor(bestTime / 60);
+            var secondsb = Math.round(bestTime % 60);
+
+            // display elapsed time in minutes:seconds format
+            var timeDisplayb = (minutesb < 10 ? "0" : "") + minutesb + ":" + (secondsb < 10 ? "0" : "") + secondsb;
+            document.getElementById("timeb").innerHTML = timeDisplayb;
+          } else {
+            document.getElementById("timeb").innerHTML = "None"
+          }
+        }
+        setbesttime()
+
+
+        setInterval(() => {
+          if (!localStorage.getItem('gameState')) {
+            return;
+          }
+          let startTime = new Date(JSON.parse(localStorage.getItem('gameState')).startTime);
+          
+          endTime = new Date();
+          var timeDiff = endTime - startTime; //in milliseconds
+          // strip the ms
+          timeDiff /= 1000;
+
+          // get minutes and seconds
+          var minutes = Math.floor(timeDiff / 60);
+          var seconds = Math.round(timeDiff % 60);
+
+          // display elapsed time in minutes:seconds format
+          var timeDisplay = (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+          document.getElementById("timed").innerHTML = timeDisplay;
+        }, 1000);
+        function getRandomInt(min, max) {
+          return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        setInterval(() => {
+          if (localStorage.getItem('isBot') == 2) {
+            var event = new KeyboardEvent('keydown', { 'keyCode': getRandomInt(37, 40) });
+            document.dispatchEvent(event);
+          }
+        }, 300)
+      </script>
+      <script src="js/bind_polyfill.js"></script>
+      <script src="js/classlist_polyfill.js"></script>
+      <script src="js/animframe_polyfill.js"></script>
+      <script src="js/keyboard_input_manager.js"></script>
+      <script src="js/html_actuator.js"></script>
+      <script src="js/grid.js"></script>
+      <script src="js/tile.js"></script>
+      <script src="js/local_storage_manager.js"></script>
+      <script src="js/game_manager.js"></script>
+      <script src="js/application.js"></script>
+</body>
+
+</html>
